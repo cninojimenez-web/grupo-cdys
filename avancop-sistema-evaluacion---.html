@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVANCOP – Sistema de Evaluación SIAR/SARL/SARC/SARO/SARLAFT</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Crimson+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            /* Colores tomados de logos CDYS y AVANCOP */
+            --color-cdys-orange: #f39200;
+            --color-cdys-green: #3c9f4c;
+            --color-cdys-blue: #1e88d4;
+            --color-avancop-green: #4d9a3e;
+            --color-avancop-orange: #f8991d;
+            
+            --color-primary: #1e88d4;
+            --color-secondary: #3c9f4c;
+            --color-accent: #f39200;
+            --color-success: #3c9f4c;
+            --color-danger: #c73232;
+            --color-text: #2d3e50;
+            --color-text-light: #6b7280;
+            --color-bg: #fafaf9;
+            --color-card: #ffffff;
+            --font-display: 'Crimson Pro', serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+            --shadow: 0 2px 16px rgba(30, 136, 212, 0.08);
+            --shadow-lg: 0 8px 32px rgba(30, 136, 212, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-display);
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--color-cdys-blue) 0%, var(--color-cdys-green) 100%);
+            color: white;
+            padding: 1.5rem 1.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .logo-avancop {
+            height: 60px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .logo-cdys {
+            height: 70px;
+            width: auto;
+        }
+
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .card {
+            background: var(--color-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--color-accent);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--color-secondary);
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: var(--font-display);
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(30, 136, 212, 0.1);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--color-cdys-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1770b8;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #da8300;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--color-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2d7a37;
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(30, 136, 212, 0.05) 0%, rgba(60, 159, 76, 0.05) 100%);
+            border-left: 4px solid var(--color-accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box h3 {
+            color: var(--color-primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.125rem;
+        }
+
+        .info-box p {
+            color: var(--color-text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box ul {
+            margin-left: 1.5rem;
+            color: var(--color-text-light);
+        }
+
+        .question-container {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(30, 136, 212, 0.03) 0%, rgba(243, 146, 0, 0.03) 100%);
+            border-radius: 10px;
+            border-left: 4px solid var(--color-secondary);
+        }
+
+        .question-number {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            color: var(--color-accent);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .question-text {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            color: var(--color-text);
+            font-weight: 600;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            border-color: var(--color-primary);
+            background: rgba(30, 136, 212, 0.03);
+            transform: translateX(4px);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 1rem;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--color-primary);
+        }
+
+        .option label {
+            cursor: pointer;
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-cdys-blue), var(--color-cdys-green), var(--color-accent));
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .result-card {
+            background: var(--color-card);
+            padding: 2.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 4px solid var(--color-accent);
+        }
+
+        .score-display {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-cdys-blue), var(--color-cdys-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 1rem 0;
+            font-family: var(--font-mono);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 1rem;
+        }
+
+        .status-approved {
+            background: var(--color-success);
+            color: white;
+        }
+
+        .status-failed {
+            background: var(--color-danger);
+            color: white;
+        }
+
+        .feedback-item {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #e5e7eb;
+            text-align: left;
+        }
+
+        .feedback-item.correct {
+            border-left-color: var(--color-success);
+            background: rgba(60, 159, 76, 0.05);
+        }
+
+        .feedback-item.incorrect {
+            border-left-color: var(--color-danger);
+            background: rgba(199, 50, 50, 0.05);
+        }
+
+        .feedback-question {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--color-text);
+        }
+
+        .feedback-answer {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-mono);
+        }
+
+        .feedback-explanation {
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+            margin-top: 0.75rem;
+            line-height: 1.5;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .comparison-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(30, 136, 212, 0.05) 0%, rgba(243, 146, 0, 0.05) 100%);
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .comparison-label {
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: var(--font-mono);
+        }
+
+        .comparison-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-cdys-blue), var(--color-cdys-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: var(--font-mono);
+        }
+
+        .certificate-preview {
+            background: white;
+            padding: 3rem 2rem;
+            border: 6px solid var(--color-accent);
+            border-radius: 12px;
+            margin: 2rem 0;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+
+        .certificate-preview::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px solid var(--color-primary);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .cert-logos {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .cert-logo-avancop {
+            height: 50px;
+            width: auto;
+        }
+
+        .cert-logo-cdys {
+            height: 55px;
+            width: auto;
+        }
+
+        .cert-header {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-cdys-blue), var(--color-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .cert-body {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--color-text);
+            margin: 2rem 0;
+        }
+
+        .cert-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin: 1.5rem 0;
+        }
+
+        .admin-panel {
+            background: linear-gradient(135deg, var(--color-cdys-blue) 0%, var(--color-cdys-green) 100%);
+            color: white;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .admin-panel h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .admin-panel .btn {
+            margin: 0.5rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .alert-danger {
+            background: rgba(199, 50, 50, 0.1);
+            color: var(--color-danger);
+            border-left: 4px solid var(--color-danger);
+        }
+
+        .alert-info {
+            background: rgba(30, 136, 212, 0.1);
+            color: var(--color-primary);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .alert-success {
+            background: rgba(60, 159, 76, 0.1);
+            color: var(--color-success);
+            border-left: 4px solid var(--color-success);
+        }
+
+        .qr-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+            border-top: 4px solid var(--color-primary);
+        }
+
+        .qr-section h3 {
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+
+        .qr-code {
+            margin: 1.5rem auto;
+            display: inline-block;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .attempt-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .attempt-card {
+            background: linear-gradient(135deg, rgba(30, 136, 212, 0.05) 0%, rgba(243, 146, 0, 0.05) 100%);
+            border: 3px solid #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .attempt-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .attempt-card.selected {
+            border-color: var(--color-accent);
+            background: linear-gradient(135deg, rgba(243, 146, 0, 0.1) 0%, rgba(30, 136, 212, 0.1) 100%);
+        }
+
+        .attempt-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f3f4f6;
+        }
+
+        .attempt-card h4 {
+            font-size: 1.25rem;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .attempt-card p {
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .logo-container {
+                justify-content: center;
+            }
+            
+            .logo-avancop {
+                height: 50px;
+            }
+            
+            .logo-cdys {
+                height: 60px;
+            }
+            
+            .score-display {
+                font-size: 3rem;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .attempt-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="AVANCOP" class="logo-avancop" id="logo-avancop">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="CDYS Grupo Empresarial" class="logo-cdys" id="logo-cdys">
+            </div>
+            <h1>Sistema de Evaluación de Conocimientos</h1>
+            <p>Capacitación en Sistemas de Administración de Riesgos</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Pantalla de inicio -->
+        <div id="screen-home">
+            <div class="card">
+                <h2>Bienvenido al Sistema de Evaluación</h2>
+                <div class="info-box">
+                    <h3>Información Importante</h3>
+                    <p><strong>Temas evaluados:</strong></p>
+                    <ul>
+                        <li>SIAR - Sistema Integral de Administración de Riesgos</li>
+                        <li>SARL - Sistema de Administración del Riesgo de Liquidez</li>
+                        <li>SARC - Sistema de Administración del Riesgo de Crédito</li>
+                        <li>SARO - Sistema de Administración del Riesgo Operativo</li>
+                        <li>SARLAFT - Sistema de Administración del Riesgo de LA/FT</li>
+                    </ul>
+                    <p style="margin-top: 1rem;"><strong>⚠️ Importante:</strong> Cada participante puede realizar hasta dos (2) evaluaciones para medir su progreso en el conocimiento.</p>
+                </div>
+                <button class="btn btn-primary btn-full" onclick="app.goToRegistration()">Iniciar Test</button>
+            </div>
+
+            <!-- QR Code Generator -->
+            <div class="qr-section">
+                <h3>Acceso Rápido</h3>
+                <p>Escanee este código QR para acceder desde dispositivos móviles</p>
+                <div id="qrcode" class="qr-code"></div>
+                <p style="margin-top: 1rem; color: var(--color-text-light); font-size: 0.9rem;">
+                    O comparta esta URL: <strong id="share-url"></strong>
+                </p>
+            </div>
+
+            <!-- Admin Panel -->
+            <div class="admin-panel">
+                <h3>Panel de Administración</h3>
+                <button class="btn btn-secondary" onclick="app.exportData()">📊 Exportar Datos</button>
+                <button class="btn btn-secondary" onclick="app.viewParticipants()">👥 Ver Participantes</button>
+                <button class="btn btn-secondary" onclick="app.clearAllData()">🗑️ Limpiar Datos</button>
+            </div>
+        </div>
+
+        <!-- Pantalla de registro -->
+        <div id="screen-registration" class="hidden">
+            <div class="card">
+                <h2>Registro de Participante</h2>
+                <div id="alert-container"></div>
+                <form id="registration-form">
+                    <div class="form-group">
+                        <label for="id-number">Número de Identificación *</label>
+                        <input type="text" id="id-number" required placeholder="Ingrese su número de cédula">
+                    </div>
+                    <div class="form-group">
+                        <label for="full-name">Nombre Completo *</label>
+                        <input type="text" id="full-name" required placeholder="Ingrese su nombre completo">
+                    </div>
+                    <div class="form-group">
+                        <label for="position">Cargo *</label>
+                        <input type="text" id="position" required placeholder="Ingrese su cargo actual">
+                    </div>
+                    
+                    <div id="attempt-selection" class="hidden">
+                        <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">Seleccione el número de intento:</h3>
+                        <div class="attempt-selector">
+                            <div class="attempt-card" id="attempt-1-card" onclick="app.selectAttempt(1)">
+                                <h4>1er Intento</h4>
+                                <p>Evaluación inicial</p>
+                            </div>
+                            <div class="attempt-card" id="attempt-2-card" onclick="app.selectAttempt(2)">
+                                <h4>2do Intento</h4>
+                                <p>Evaluación de seguimiento</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Continuar</button>
+                    <button type="button" class="btn btn-secondary btn-full" onclick="app.showScreen('home')">Regresar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Pantalla de evaluación -->
+        <div id="screen-evaluation" class="hidden">
+            <div class="card">
+                <h2 id="evaluation-title">Test de Evaluación</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <p style="text-align: center; margin-bottom: 2rem; font-family: var(--font-mono); color: var(--color-text-light);">
+                    Pregunta <span id="current-question">1</span> de <span id="total-questions">10</span>
+                </p>
+                <div id="question-container"></div>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap;">
+                    <button id="btn-prev" class="btn btn-secondary" onclick="app.previousQuestion()">⬅ Anterior</button>
+                    <button id="btn-next" class="btn btn-primary" onclick="app.nextQuestion()">Siguiente ➡</button>
+                    <button id="btn-submit" class="btn btn-success hidden" onclick="app.submitEvaluation()">✓ Enviar Evaluación</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de resultados -->
+        <div id="screen-results" class="hidden">
+            <div class="result-card">
+                <h2>Resultados de su Evaluación</h2>
+                <p style="font-family: var(--font-mono); color: var(--color-accent); font-size: 1rem; margin-bottom: 0.5rem;" id="attempt-label">INTENTO 1</p>
+                <div class="score-display" id="score-display">0/10</div>
+                <p style="font-size: 1.25rem; color: var(--color-text-light);"><span id="score-percentage">0%</span></p>
+                <div class="status-badge" id="status-badge">APROBADO</div>
+            </div>
+
+            <div class="card" id="comparison-section" class="hidden">
+                <h3>Comparativo de Resultados</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-item">
+                        <div class="comparison-label">1er Intento</div>
+                        <div class="comparison-value" id="attempt1-score">0%</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">2do Intento</div>
+                        <div class="comparison-value" id="attempt2-score">0%</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <p style="font-size: 1.25rem; font-weight: 600;">Mejora: <span id="improvement" style="color: var(--color-accent);">+0%</span></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Retroalimentación Detallada</h3>
+                <div id="feedback-container"></div>
+            </div>
+
+            <div class="card" id="certificate-section">
+                <h3>Certificado de Asistencia</h3>
+                <div class="certificate-preview" id="certificate-preview">
+                    <div class="cert-logos">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="AVANCOP" class="cert-logo-avancop" id="cert-logo-avancop">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="CDYS" class="cert-logo-cdys" id="cert-logo-cdys">
+                    </div>
+                    <div class="cert-header">CERTIFICADO DE ASISTENCIA</div>
+                    <div class="cert-body">
+                        <p>Se certifica que</p>
+                        <div class="cert-name" id="cert-name">NOMBRE COMPLETO</div>
+                        <p>identificado(a) con cédula No. <strong id="cert-id">000000</strong></p>
+                        <p>en su calidad de <strong id="cert-position">CARGO</strong></p>
+                        <p style="margin-top: 1.5rem;">Asistió a la capacitación</p>
+                        <p style="font-size: 1.25rem; font-weight: 600; margin-top: 1rem; color: var(--color-primary);">
+                            "Sistemas de Administración de Riesgos:<br>SIAR, SARL, SARC, SARO y SARLAFT"
+                        </p>
+                        <p style="margin-top: 1.5rem; font-weight: 600;">AVANCOP - Cooperativa de Ahorro y Crédito</p>
+                        <p style="font-size: 0.9rem; color: var(--color-text-light);">En alianza con CDYS Grupo Empresarial</p>
+                        <p id="cert-date" style="margin-top: 1rem;">Fecha: 00/00/0000</p>
+                    </div>
+                </div>
+                <button class="btn btn-success btn-full" onclick="app.downloadCertificate()">📄 Descargar Certificado PDF</button>
+            </div>
+
+            <button class="btn btn-secondary btn-full" onclick="app.returnHome()">🏠 Finalizar</button>
+        </div>
+
+        <!-- Pantalla de participantes -->
+        <div id="screen-participants" class="hidden">
+            <div class="card">
+                <h2>Lista de Participantes</h2>
+                <div id="participants-list"></div>
+                <button class="btn btn-secondary btn-full" onclick="app.showScreen('home')">Regresar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cargar logos
+        function loadLogos() {
+            // Logo AVANCOP
+            const logoAvancop = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+            
+            // Logo CDYS
+            const logoCdys = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+            
+            // Aplicar logos en header
+            document.getElementById('logo-avancop').src = '/mnt/user-data/uploads/1769092525465_LogoAvancop.png';
+            document.getElementById('logo-cdys').src = '/mnt/user-data/uploads/1769092525466_LOGO_BIRISK.png';
+            
+            // Aplicar logos en certificado
+            document.getElementById('cert-logo-avancop').src = '/mnt/user-data/uploads/1769092525465_LogoAvancop.png';
+            document.getElementById('cert-logo-cdys').src = '/mnt/user-data/uploads/1769092525466_LOGO_BIRISK.png';
+        }
+
+        // Base de datos de preguntas
+        const questionBank = [
+            {
+                id: 1,
+                question: "¿Qué establece el Sistema de Administración del Riesgo de Lavado de Activos y Financiación del Terrorismo (SARLAFT)?",
+                options: [
+                    "Procedimientos para el manejo de cartera vencida",
+                    "Marco integral de políticas, procedimientos y controles para prevenir LA/FT",
+                    "Requisitos de capitalización mínima",
+                    "Normatividad sobre tasas de interés"
+                ],
+                correct: 1,
+                feedback: "El SARLAFT es un sistema integral que establece políticas, procedimientos, documentación, estructura organizacional, órganos de control y mecanismos de prevención diseñados para prevenir que la entidad sea utilizada como instrumento para el lavado de activos y/o canalización de recursos hacia actividades terroristas."
+            },
+            {
+                id: 2,
+                question: "¿Cuál es el objetivo principal del Sistema de Administración del Riesgo de Crédito (SARC)?",
+                options: [
+                    "Aumentar la rentabilidad de la cartera",
+                    "Identificar, medir, controlar y monitorear el riesgo de crédito",
+                    "Establecer tasas preferenciales",
+                    "Reducir los gastos administrativos"
+                ],
+                correct: 1,
+                feedback: "El SARC tiene como objetivo fundamental identificar, medir, controlar y monitorear el riesgo de crédito, entendido como la posible pérdida que asume la entidad por incumplimiento de sus deudores u otras contrapartes en sus obligaciones contractuales."
+            },
+            {
+                id: 3,
+                question: "¿Qué comprende el Sistema de Administración del Riesgo de Liquidez (SARL)?",
+                options: [
+                    "Solo el manejo de efectivo disponible",
+                    "Políticas y procedimientos para administrar el riesgo de no poder cumplir obligaciones",
+                    "Estrategias de inversión en el mercado de valores",
+                    "Normas contables para provisiones"
+                ],
+                correct: 1,
+                feedback: "El SARL comprende políticas, procedimientos, documentación, estructura organizacional y mecanismos de control diseñados para administrar el riesgo de que la entidad no pueda cumplir de manera eficiente sus obligaciones o que para hacerlo deba recurrir a la venta de activos en condiciones desfavorables."
+            },
+            {
+                id: 4,
+                question: "¿Cuál es la función principal del Sistema de Administración del Riesgo Operativo (SARO)?",
+                options: [
+                    "Controlar únicamente los riesgos tecnológicos",
+                    "Identificar, medir, controlar y monitorear el riesgo de pérdidas por fallas en procesos, personal, sistemas o eventos externos",
+                    "Gestionar la rotación de personal",
+                    "Administrar el inventario de activos fijos"
+                ],
+                correct: 1,
+                feedback: "El SARO tiene como función identificar, medir, controlar y monitorear el riesgo operativo, entendido como la posibilidad de incurrir en pérdidas por deficiencias, fallas o inadecuaciones en el recurso humano, los procesos, la tecnología, la infraestructura o por la ocurrencia de acontecimientos externos."
+            },
+            {
+                id: 5,
+                question: "¿Qué elemento NO es obligatorio en la estructura del SARLAFT según normativa colombiana?",
+                options: [
+                    "Oficial de cumplimiento",
+                    "Manual de procedimientos",
+                    "Departamento de auditoría externa permanente",
+                    "Mecanismos de control y monitoreo"
+                ],
+                correct: 2,
+                feedback: "Si bien la auditoría externa es recomendable, no es un elemento estructural obligatorio del SARLAFT. Los elementos obligatorios incluyen: oficial de cumplimiento, políticas, procedimientos, documentación, estructura organizacional, infraestructura tecnológica, órganos de control y mecanismos de capacitación."
+            },
+            {
+                id: 6,
+                question: "En el contexto del SARC, ¿qué representa la categoría 'D' en la clasificación de cartera?",
+                options: [
+                    "Cartera de difícil cobro",
+                    "Cartera en mora superior a 180 días con alto riesgo de pérdida",
+                    "Cartera con descuento comercial",
+                    "Cartera destinada a depuración"
+                ],
+                correct: 1,
+                feedback: "La categoría 'D' (Deficiente) corresponde a obligaciones con mora superior a 180 días, donde se observan deficiencias en la capacidad de pago del deudor y alta probabilidad de no recuperación del crédito, requiriendo provisiones entre 60% y 100%."
+            },
+            {
+                id: 7,
+                question: "¿Cuál es el indicador clave que mide el SARL para evaluar la capacidad de cumplimiento de obligaciones inmediatas?",
+                options: [
+                    "Índice de rentabilidad",
+                    "Indicador de Riesgo de Liquidez (IRL)",
+                    "Ratio de solvencia",
+                    "Margen de intermediación"
+                ],
+                correct: 1,
+                feedback: "El Indicador de Riesgo de Liquidez (IRL) es la herramienta cuantitativa fundamental del SARL que mide la relación entre activos líquidos y obligaciones a corto plazo, permitiendo evaluar si la entidad puede cumplir con sus compromisos inmediatos sin incurrir en pérdidas."
+            },
+            {
+                id: 8,
+                question: "Según el SARO, ¿cuál es el primer paso metodológico en la gestión del riesgo operativo?",
+                options: [
+                    "Implementar controles automáticos",
+                    "Identificación de eventos de riesgo operativo",
+                    "Capacitación al personal",
+                    "Contratación de seguros"
+                ],
+                correct: 1,
+                feedback: "La identificación de eventos de riesgo operativo es el primer paso metodológico del SARO. Antes de medir, controlar o monitorear, la entidad debe identificar sistemáticamente los factores de riesgo asociados a procesos, personas, tecnología, infraestructura y eventos externos."
+            },
+            {
+                id: 9,
+                question: "¿Qué señal de alerta es considerada CRÍTICA en el SARLAFT para identificar operaciones inusuales?",
+                options: [
+                    "Cliente que realiza retiros semanales",
+                    "Operaciones que no guardan relación con la actividad económica declarada del cliente",
+                    "Cliente que prefiere atención personalizada",
+                    "Uso frecuente de canales digitales"
+                ],
+                correct: 1,
+                feedback: "Las operaciones que no guardan relación con el perfil económico, financiero y transaccional del cliente constituyen una señal de alerta crítica en el SARLAFT, ya que pueden indicar actividades de lavado de activos. La entidad debe documentar, investigar y eventualmente reportar estas inconsistencias."
+            },
+            {
+                id: 10,
+                question: "¿Qué componente del Sistema Integral de Administración de Riesgos (SIAR) coordina la visión consolidada de todos los riesgos?",
+                options: [
+                    "Área de auditoría",
+                    "Gerencia de riesgos o función equivalente",
+                    "Asamblea General",
+                    "Revisor fiscal"
+                ],
+                correct: 1,
+                feedback: "El SIAR requiere una Gerencia de Riesgos (o función equivalente) que coordine de manera integral todos los sistemas de administración de riesgos (SARC, SARL, SARO, SARLAFT), proporcione una visión consolidada de la exposición al riesgo y reporte a la Alta Dirección sobre el perfil de riesgo de la entidad."
+            }
+        ];
+
+        // Aplicación principal
+        const app = {
+            currentScreen: 'home',
+            attemptNumber: null,
+            currentParticipant: null,
+            currentQuestionIndex: 0,
+            answers: [],
+            startTime: null,
+
+            init() {
+                loadLogos();
+                this.generateQRCode();
+                this.loadScreen();
+            },
+
+            generateQRCode() {
+                const url = window.location.href;
+                document.getElementById('share-url').textContent = url;
+                
+                new QRCode(document.getElementById("qrcode"), {
+                    text: url,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#1e88d4",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            },
+
+            showScreen(screen) {
+                const screens = ['home', 'registration', 'evaluation', 'results', 'participants'];
+                screens.forEach(s => {
+                    document.getElementById(`screen-${s}`).classList.add('hidden');
+                });
+                
+                document.getElementById(`screen-${screen}`).classList.remove('hidden');
+                this.currentScreen = screen;
+                window.scrollTo(0, 0);
+            },
+
+            goToRegistration() {
+                this.showScreen('registration');
+            },
+
+            loadScreen() {
+                const form = document.getElementById('registration-form');
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.validateAndProceed();
+                });
+
+                // Listener para campos de registro
+                ['id-number', 'full-name', 'position'].forEach(fieldId => {
+                    document.getElementById(fieldId).addEventListener('input', () => {
+                        this.checkRegistrationFields();
+                    });
+                });
+            },
+
+            checkRegistrationFields() {
+                const idNumber = document.getElementById('id-number').value.trim();
+                const fullName = document.getElementById('full-name').value.trim();
+                const position = document.getElementById('position').value.trim();
+                
+                if (idNumber && fullName && position) {
+                    // Verificar intentos disponibles
+                    const participants = this.getParticipants();
+                    const existing = participants.find(p => p.idNumber === idNumber);
+                    
+                    document.getElementById('attempt-selection').classList.remove('hidden');
+                    
+                    // Actualizar estado de los botones de intento
+                    const attempt1Card = document.getElementById('attempt-1-card');
+                    const attempt2Card = document.getElementById('attempt-2-card');
+                    
+                    if (existing) {
+                        if (existing.attempt1) {
+                            attempt1Card.classList.add('disabled');
+                            attempt1Card.onclick = null;
+                        } else {
+                            attempt1Card.classList.remove('disabled');
+                            attempt1Card.onclick = () => this.selectAttempt(1);
+                        }
+                        
+                        if (existing.attempt2) {
+                            attempt2Card.classList.add('disabled');
+                            attempt2Card.onclick = null;
+                        } else if (!existing.attempt1) {
+                            attempt2Card.classList.add('disabled');
+                            attempt2Card.onclick = null;
+                        } else {
+                            attempt2Card.classList.remove('disabled');
+                            attempt2Card.onclick = () => this.selectAttempt(2);
+                        }
+                    } else {
+                        attempt1Card.classList.remove('disabled');
+                        attempt1Card.onclick = () => this.selectAttempt(1);
+                        attempt2Card.classList.add('disabled');
+                        attempt2Card.onclick = null;
+                    }
+                } else {
+                    document.getElementById('attempt-selection').classList.add('hidden');
+                }
+            },
+
+            selectAttempt(attemptNum) {
+                this.attemptNumber = attemptNum;
+                
+                document.getElementById('attempt-1-card').classList.remove('selected');
+                document.getElementById('attempt-2-card').classList.remove('selected');
+                
+                document.getElementById(`attempt-${attemptNum}-card`).classList.add('selected');
+            },
+
+            validateAndProceed() {
+                const idNumber = document.getElementById('id-number').value.trim();
+                const fullName = document.getElementById('full-name').value.trim();
+                const position = document.getElementById('position').value.trim();
+                const alertContainer = document.getElementById('alert-container');
+
+                alertContainer.innerHTML = '';
+
+                if (!idNumber || !fullName || !position) {
+                    alertContainer.innerHTML = '<div class="alert alert-danger">Todos los campos son obligatorios.</div>';
+                    return;
+                }
+
+                if (!this.attemptNumber) {
+                    alertContainer.innerHTML = '<div class="alert alert-danger">Debe seleccionar el número de intento.</div>';
+                    return;
+                }
+
+                const participants = this.getParticipants();
+                const existing = participants.find(p => p.idNumber === idNumber);
+
+                if (this.attemptNumber === 1 && existing && existing.attempt1) {
+                    alertContainer.innerHTML = '<div class="alert alert-danger">Ya completó el primer intento.</div>';
+                    return;
+                }
+
+                if (this.attemptNumber === 2) {
+                    if (!existing || !existing.attempt1) {
+                        alertContainer.innerHTML = '<div class="alert alert-danger">Debe completar el primer intento antes del segundo.</div>';
+                        return;
+                    }
+                    if (existing.attempt2) {
+                        alertContainer.innerHTML = '<div class="alert alert-danger">Ya completó el segundo intento.</div>';
+                        return;
+                    }
+                }
+
+                this.startEvaluation(idNumber, fullName, position);
+            },
+
+            startEvaluation(idNumber, fullName, position) {
+                this.currentParticipant = { idNumber, fullName, position };
+                this.currentQuestionIndex = 0;
+                this.answers = new Array(questionBank.length).fill(null);
+                this.startTime = new Date();
+
+                this.showScreen('evaluation');
+                this.renderQuestion();
+                
+                document.getElementById('evaluation-title').textContent = `Test de Evaluación - Intento ${this.attemptNumber}`;
+            },
+
+            renderQuestion() {
+                const question = questionBank[this.currentQuestionIndex];
+                const container = document.getElementById('question-container');
+                
+                container.innerHTML = `
+                    <div class="question-container">
+                        <div class="question-number">PREGUNTA ${this.currentQuestionIndex + 1}</div>
+                        <div class="question-text">${question.question}</div>
+                        <div class="options">
+                            ${question.options.map((option, index) => `
+                                <div class="option">
+                                    <input type="radio" 
+                                           id="option-${index}" 
+                                           name="answer" 
+                                           value="${index}"
+                                           ${this.answers[this.currentQuestionIndex] === index ? 'checked' : ''}
+                                           onchange="app.selectAnswer(${index})">
+                                    <label for="option-${index}">${option}</label>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                const progress = ((this.currentQuestionIndex + 1) / questionBank.length) * 100;
+                document.getElementById('progress-fill').style.width = progress + '%';
+                document.getElementById('current-question').textContent = this.currentQuestionIndex + 1;
+                document.getElementById('total-questions').textContent = questionBank.length;
+
+                document.getElementById('btn-prev').style.display = this.currentQuestionIndex === 0 ? 'none' : 'inline-block';
+                
+                if (this.currentQuestionIndex === questionBank.length - 1) {
+                    document.getElementById('btn-next').classList.add('hidden');
+                    document.getElementById('btn-submit').classList.remove('hidden');
+                } else {
+                    document.getElementById('btn-next').classList.remove('hidden');
+                    document.getElementById('btn-submit').classList.add('hidden');
+                }
+            },
+
+            selectAnswer(index) {
+                this.answers[this.currentQuestionIndex] = index;
+            },
+
+            previousQuestion() {
+                if (this.currentQuestionIndex > 0) {
+                    this.currentQuestionIndex--;
+                    this.renderQuestion();
+                }
+            },
+
+            nextQuestion() {
+                if (this.currentQuestionIndex < questionBank.length - 1) {
+                    this.currentQuestionIndex++;
+                    this.renderQuestion();
+                }
+            },
+
+            submitEvaluation() {
+                if (this.answers.includes(null)) {
+                    alert('Por favor responda todas las preguntas antes de enviar.');
+                    return;
+                }
+
+                const endTime = new Date();
+                const score = this.calculateScore();
+                
+                this.saveResults(score, endTime);
+                this.showResults(score);
+            },
+
+            calculateScore() {
+                let correct = 0;
+                this.answers.forEach((answer, index) => {
+                    if (answer === questionBank[index].correct) {
+                        correct++;
+                    }
+                });
+                return correct;
+            },
+
+            saveResults(score, endTime) {
+                const participants = this.getParticipants();
+                const existingIndex = participants.findIndex(p => p.idNumber === this.currentParticipant.idNumber);
+                
+                const testData = {
+                    score,
+                    percentage: (score / questionBank.length) * 100,
+                    passed: score >= 8,
+                    answers: this.answers,
+                    startTime: this.startTime.toISOString(),
+                    endTime: endTime.toISOString(),
+                    date: new Date().toLocaleDateString('es-CO')
+                };
+
+                if (existingIndex >= 0) {
+                    participants[existingIndex][`attempt${this.attemptNumber}`] = testData;
+                } else {
+                    const newParticipant = {
+                        ...this.currentParticipant,
+                        attempt1: this.attemptNumber === 1 ? testData : null,
+                        attempt2: this.attemptNumber === 2 ? testData : null
+                    };
+                    participants.push(newParticipant);
+                }
+
+                localStorage.setItem('avancop_participants', JSON.stringify(participants));
+            },
+
+            showResults(score) {
+                this.showScreen('results');
+                
+                const percentage = (score / questionBank.length) * 100;
+                const passed = score >= 8;
+
+                document.getElementById('attempt-label').textContent = `INTENTO ${this.attemptNumber}`;
+                document.getElementById('score-display').textContent = `${score}/10`;
+                document.getElementById('score-percentage').textContent = `${percentage.toFixed(0)}%`;
+                
+                const statusBadge = document.getElementById('status-badge');
+                statusBadge.textContent = passed ? '✓ APROBADO' : '✗ NO APROBADO';
+                statusBadge.className = 'status-badge ' + (passed ? 'status-approved' : 'status-failed');
+
+                this.renderFeedback();
+
+                const participants = this.getParticipants();
+                const participant = participants.find(p => p.idNumber === this.currentParticipant.idNumber);
+                
+                if (participant && participant.attempt1 && participant.attempt2) {
+                    this.showComparison(participant);
+                } else {
+                    document.getElementById('comparison-section').classList.add('hidden');
+                }
+
+                this.showCertificate();
+            },
+
+            renderFeedback() {
+                const container = document.getElementById('feedback-container');
+                container.innerHTML = '';
+
+                questionBank.forEach((question, index) => {
+                    const userAnswer = this.answers[index];
+                    const isCorrect = userAnswer === question.correct;
+                    
+                    const feedbackItem = document.createElement('div');
+                    feedbackItem.className = `feedback-item ${isCorrect ? 'correct' : 'incorrect'}`;
+                    
+                    feedbackItem.innerHTML = `
+                        <div class="feedback-question"><strong>Pregunta ${index + 1}:</strong> ${question.question}</div>
+                        <div class="feedback-answer">
+                            <strong>Su respuesta:</strong> ${question.options[userAnswer]}
+                            ${!isCorrect ? `<br><strong style="color: var(--color-success);">Respuesta correcta:</strong> ${question.options[question.correct]}` : ''}
+                        </div>
+                        <div class="feedback-explanation">
+                            <strong>📚 Explicación:</strong> ${question.feedback}
+                        </div>
+                    `;
+                    
+                    container.appendChild(feedbackItem);
+                });
+            },
+
+            showComparison(participant) {
+                document.getElementById('comparison-section').classList.remove('hidden');
+                
+                const score1 = participant.attempt1.percentage;
+                const score2 = participant.attempt2.percentage;
+                const improvement = score2 - score1;
+                
+                document.getElementById('attempt1-score').textContent = `${score1.toFixed(0)}%`;
+                document.getElementById('attempt2-score').textContent = `${score2.toFixed(0)}%`;
+                document.getElementById('improvement').textContent = 
+                    `${improvement >= 0 ? '+' : ''}${improvement.toFixed(0)}%`;
+                document.getElementById('improvement').style.color = 
+                    improvement >= 0 ? 'var(--color-success)' : 'var(--color-danger)';
+            },
+
+            showCertificate() {
+                document.getElementById('cert-name').textContent = this.currentParticipant.fullName.toUpperCase();
+                document.getElementById('cert-id').textContent = this.currentParticipant.idNumber;
+                document.getElementById('cert-position').textContent = this.currentParticipant.position;
+                document.getElementById('cert-date').textContent = 
+                    `Fecha: ${new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+            },
+
+            downloadCertificate() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFont("helvetica");
+                
+                // Borde dorado
+                doc.setLineWidth(5);
+                doc.setDrawColor(243, 146, 0);
+                doc.rect(10, 10, 190, 277);
+                
+                // Borde azul interno
+                doc.setLineWidth(2);
+                doc.setDrawColor(30, 136, 212);
+                doc.rect(15, 15, 180, 267);
+                
+                // Encabezado
+                doc.setFontSize(26);
+                doc.setTextColor(30, 136, 212);
+                doc.setFont("helvetica", "bold");
+                doc.text("CERTIFICADO DE ASISTENCIA", 105, 45, { align: "center" });
+                
+                // Contenido
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(50, 50, 50);
+                doc.text("Se certifica que", 105, 75, { align: "center" });
+                
+                doc.setFontSize(22);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(243, 146, 0);
+                doc.text(this.currentParticipant.fullName.toUpperCase(), 105, 90, { align: "center" });
+                
+                doc.setFontSize(12);
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(50, 50, 50);
+                doc.text(`Identificado(a) con cédula No. ${this.currentParticipant.idNumber}`, 105, 105, { align: "center" });
+                doc.text(`En su calidad de ${this.currentParticipant.position}`, 105, 115, { align: "center" });
+                
+                doc.setFontSize(14);
+                doc.text("Asistió a la capacitación", 105, 135, { align: "center" });
+                
+                doc.setFontSize(16);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(30, 136, 212);
+                const title = doc.splitTextToSize("Sistemas de Administración de Riesgos: SIAR, SARL, SARC, SARO y SARLAFT", 160);
+                doc.text(title, 105, 150, { align: "center" });
+                
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(60, 159, 76);
+                doc.text("AVANCOP", 105, 180, { align: "center" });
+                doc.setFontSize(11);
+                doc.setFont("helvetica", "normal");
+                doc.text("Cooperativa de Ahorro y Crédito", 105, 188, { align: "center" });
+                
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text("En alianza con CDYS Grupo Empresarial", 105, 198, { align: "center" });
+                
+                doc.setFontSize(12);
+                const today = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+                doc.text(`Fecha: ${today}`, 105, 215, { align: "center" });
+                
+                doc.save(`Certificado_${this.currentParticipant.idNumber}_AVANCOP.pdf`);
+            },
+
+            returnHome() {
+                this.currentParticipant = null;
+                this.attemptNumber = null;
+                this.answers = [];
+                
+                document.getElementById('registration-form').reset();
+                document.getElementById('attempt-selection').classList.add('hidden');
+                document.getElementById('attempt-1-card').classList.remove('selected');
+                document.getElementById('attempt-2-card').classList.remove('selected');
+                
+                this.showScreen('home');
+            },
+
+            getParticipants() {
+                const data = localStorage.getItem('avancop_participants');
+                return data ? JSON.parse(data) : [];
+            },
+
+            viewParticipants() {
+                const participants = this.getParticipants();
+                const container = document.getElementById('participants-list');
+                
+                if (participants.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--color-text-light); padding: 2rem;">No hay participantes registrados aún.</p>';
+                } else {
+                    let html = '<div style="overflow-x: auto;">';
+                    html += '<table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">';
+                    html += '<thead><tr style="background: linear-gradient(135deg, var(--color-cdys-blue), var(--color-cdys-green)); color: white;">';
+                    html += '<th style="padding: 1rem; text-align: left;">Identificación</th>';
+                    html += '<th style="padding: 1rem; text-align: left;">Nombre</th>';
+                    html += '<th style="padding: 1rem; text-align: center;">1er Intento</th>';
+                    html += '<th style="padding: 1rem; text-align: center;">2do Intento</th>';
+                    html += '<th style="padding: 1rem; text-align: center;">Mejora</th>';
+                    html += '</tr></thead><tbody>';
+                    
+                    participants.forEach(p => {
+                        html += '<tr style="border-bottom: 1px solid #e5e7eb;">';
+                        html += `<td style="padding: 0.75rem; font-family: var(--font-mono);">${p.idNumber}</td>`;
+                        html += `<td style="padding: 0.75rem;">${p.fullName}</td>`;
+                        html += `<td style="padding: 0.75rem; text-align: center; font-weight: 600;">${p.attempt1 ? p.attempt1.percentage.toFixed(0) + '%' : '-'}</td>`;
+                        html += `<td style="padding: 0.75rem; text-align: center; font-weight: 600;">${p.attempt2 ? p.attempt2.percentage.toFixed(0) + '%' : '-'}</td>`;
+                        
+                        let improvement = '-';
+                        let color = 'inherit';
+                        if (p.attempt1 && p.attempt2) {
+                            const diff = p.attempt2.percentage - p.attempt1.percentage;
+                            improvement = (diff >= 0 ? '+' : '') + diff.toFixed(0) + '%';
+                            color = diff >= 0 ? 'var(--color-success)' : 'var(--color-danger)';
+                        }
+                        html += `<td style="padding: 0.75rem; text-align: center; font-weight: 600; color: ${color};">${improvement}</td>`;
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    container.innerHTML = html;
+                }
+                
+                this.showScreen('participants');
+            },
+
+            exportData() {
+                const participants = this.getParticipants();
+                
+                if (participants.length === 0) {
+                    alert('No hay datos para exportar.');
+                    return;
+                }
+
+                let csv = 'Identificación,Nombre,Cargo,1er Intento Puntaje,1er Intento %,1er Intento Aprobado,1er Intento Fecha,2do Intento Puntaje,2do Intento %,2do Intento Aprobado,2do Intento Fecha,Mejora %\n';
+                
+                participants.forEach(p => {
+                    const att1Score = p.attempt1 ? p.attempt1.score : '-';
+                    const att1Percent = p.attempt1 ? p.attempt1.percentage.toFixed(0) : '-';
+                    const att1Passed = p.attempt1 ? (p.attempt1.passed ? 'Sí' : 'No') : '-';
+                    const att1Date = p.attempt1 ? p.attempt1.date : '-';
+                    
+                    const att2Score = p.attempt2 ? p.attempt2.score : '-';
+                    const att2Percent = p.attempt2 ? p.attempt2.percentage.toFixed(0) : '-';
+                    const att2Passed = p.attempt2 ? (p.attempt2.passed ? 'Sí' : 'No') : '-';
+                    const att2Date = p.attempt2 ? p.attempt2.date : '-';
+                    
+                    const improvement = (p.attempt1 && p.attempt2) ? 
+                        (p.attempt2.percentage - p.attempt1.percentage).toFixed(0) : '-';
+                    
+                    csv += `${p.idNumber},"${p.fullName}","${p.position}",${att1Score},${att1Percent},${att1Passed},${att1Date},${att2Score},${att2Percent},${att2Passed},${att2Date},${improvement}\n`;
+                });
+
+                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `AVANCOP_Evaluaciones_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+            },
+
+            clearAllData() {
+                if (confirm('¿Está seguro de que desea eliminar TODOS los datos? Esta acción no se puede deshacer.')) {
+                    if (confirm('CONFIRMACIÓN FINAL: Se eliminarán permanentemente todos los registros de participantes y evaluaciones.')) {
+                        localStorage.removeItem('avancop_participants');
+                        alert('✓ Todos los datos han sido eliminados exitosamente.');
+                        location.reload();
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
